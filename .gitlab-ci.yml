@@ -5,7 +5,7 @@ before_script:
   - mkdir -p /go/src/github.com/crankykernel/cryptoxscanner
   - cp -a . /go/src/github.com/crankykernel/cryptoxscanner
   - pwd
-  - cd /tmp
+  - (cd /tmp)
   - pwd
 
 build:
