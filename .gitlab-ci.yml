@@ -4,8 +4,7 @@ before_script:
   - yum -y install git make
   - mkdir -p /go/src/github.com/crankykernel/cryptoxscanner
   - cp -a . /go/src/github.com/crankykernel/cryptoxscanner
-  - curl -o /tmp/go.tar.gz -L \
-        https://dl.google.com/go/go1.10.2.linux-amd64.tar.gz
+  - curl -o /tmp/go.tar.gz -L https://dl.google.com/go/go1.10.2.linux-amd64.tar.gz
   - (cd /usr/local && tar xvf /tmp/go.tar.gz)
 
 build:
