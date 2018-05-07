@@ -1,0 +1,40 @@
+image: centos:7
+
+before_script:
+  - yum -y install git make
+  - mkdir -p /go/src/github.com/crankykernel/cryptoxscanner
+  - cp -a . /go/src/github.com/crankykernel/cryptoxscanner
+  - curl -o /tmp/go.tar.gz -L https://dl.google.com/go/go1.10.2.linux-amd64.tar.gz
+  - (cd /usr/local && tar xf /tmp/go.tar.gz)
+  - curl --silent -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
+  - export NVM_DIR="$HOME/.nvm"
+  - . ${NVM_DIR}/nvm.sh
+  - nvm install --lts
+  - nvm use --lts
+
+build:
+  script: |
+    export GOPATH=/go
+    export PATH=$GOPATH/bin:/usr/local/go/bin:$PATH
+    go version
+    go env
+    go get -u github.com/golang/dep/cmd/dep
+    cd /go/src/github.com/crankykernel/cryptoxscanner
+    dep ensure
+    go build
+    (
+      cd webapp
+      npm install
+      ./node_modules/.bin/ng build --prod --aot
+    )
+
+    ls -l cryptoxscanner
+    ls -l webapp/dist
+
+    # make dist
+    # cp dist/*.zip ${CI_PROJECT_DIR}
+
+  # artifacts:
+  #   paths:
+  #     - "*.zip"
+
