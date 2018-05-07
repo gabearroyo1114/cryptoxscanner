@@ -21,8 +21,12 @@ build:
     nvm use --lts
 
     cd /go/src/github.com/crankykernel/cryptoxscanner
-    make
-    (cd webapp && make)
+    go build
+    (
+      cd webapp
+      npm install
+      ./node_modules/.bin/ng build --prod --aot
+    )
 
     # make dist
     # cp dist/*.zip ${CI_PROJECT_DIR}
