@@ -1,0 +1,45 @@
+@import "~bootstrap/scss/bootstrap";
+@import "~toastr/build/toastr.css";
+
+.app-toolbar {
+  .col {
+    @extend .mt-2;
+    @extend .mt-lg-0;
+  }
+}
+
+body {
+  // For the fixed top navbar...
+  padding-top: 56px;
+}
+
+.app-btn-card-title {
+  padding: 0px;
+  margin: 0px;
+}
+
+.toolbar {
+  .input-group {
+    display: inline;
+  }
+}
+
+td {
+  .up {
+    color: green;
+  }
+
+  .down {
+    color: red;
+  }
+}
+
+.app-google-chart-tooltip {
+  padding-bottom: 0px;
+  margin-bottom: 0px;
+}
+
+.no-radius {
+  border-top-right-radius: 0px !important;
+  border-bottom-right-radius: 0px !important;
+}

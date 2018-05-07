@@ -1,0 +1,396 @@
+<div class="container-fluid">
+
+  <nav class="navbar navbar-expand-lg navbar-light bg-light mt-2 mb-2">
+    <button class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#chartNav"
+            aria-controls="chartNav" aria-expanded="false"
+            aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="chartNav">
+
+      <ul class="navbar-nav mr-auto">
+
+        <li class="nav-item mr-2">
+          <a class="nav-link btn btn-outline-secondary btn-sm"
+             href="https://www.binance.com/tradeDetail.html?symbol={{exchangeSymbol}}"
+             target="_blank">Binance</a>
+        </li>
+
+        <li class="nav-item mr-2">
+          <a href="https://www.tradingview.com/chart?symbol=BINANCE:{{symbol}}"
+             class="nav-link btn btn-outline-secondary btn-sm" target="_blank">TradingView</a>
+        </li>
+
+        <li class="nav-item mr-2">
+          <span *ngIf="lastPrice" class="navbar-text">Last: {{lastPrice |
+            number:".8"}}</span>
+        </li>
+
+        <li class="nav-item mr-2">
+          <span *ngIf="lastKline" class="navbar-text">Open:
+            {{lastKline.open}}</span>
+        </li>
+
+        <li class="nav-item">
+          <span *ngIf="lastKline" class="navbar-text">Close:
+            {{lastKline.close}}</span>
+        </li>
+
+      </ul>
+
+      <ul class="navbar-nav">
+        <li class="nav-item navbar-text mr-2">
+          Binance Socket:
+          <span [ngSwitch]="binanceState">
+            <span *ngSwitchCase="'connected'">
+              <span class="badge badge-success">{{binanceState}}</span>
+            </span>
+            <span *ngSwitchDefault>
+              <span class="badge badge-warning">{{binanceState}}</span>
+            </span>
+          </span>
+        </li>
+        <li class="nav-item navbar-text mr-2">
+          TokenFX Socket:
+          <span [ngSwitch]="tokenFxState">
+            <span *ngSwitchCase="'connected'">
+              <span class="badge badge-success">{{tokenFxState}}</span>
+            </span>
+            <span *ngSwitchDefault>
+              <span class="badge badge-warning">{{tokenFxState}}</span>
+            </span>
+          </span>
+        </li>
+      </ul>
+
+      <ul class="navbar-nav">
+        <li class="nav-item dropdown" id="symbolSelectMenu">
+          <a class="nav-link dropdown-toggle" href="javascript:void(0);"
+             id="symbolSelectDropdown"
+             role="button" data-toggle="dropdown" aria-haspopup="true"
+             aria-expanded="false"
+             (click)="toggleSymbolDropdown(); $event.stopPropagation()">
+            {{symbol}}
+          </a>
+          <div class="dropdown-menu dropdown-menu-right"
+               id="symbolSelectDropdownMenu"
+               style="max-height: 300px; height: auto; overflow-x: hidden; width: 200px;"
+               aria-labelledby="symbolSelectDropdown">
+
+            <div class="px-2">
+              <div class="form-group">
+                <div class="input-group input-group-sm">
+                  <div class="input-group-prepend">
+                    <div class="input-group-text"><i class="fa fa-search"></i>
+                    </div>
+                  </div>
+                  <input type="text" class="form-control" #symbolFilter
+                         placeholder="Search..." id="symbolFilterInput">
+                  <div class="input-group-append">
+                    <button class="btn btn-secondary"
+                            (click)="symbolFilter.value=''; $event.stopPropagation();">
+                      <i class="fa fa-times-circle"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" style="cursor: pointer;"
+               href="javascript:void(0);"
+               (click)="symbol=s; changeSymbol(); toggleSymbolDropdown();"
+               *ngFor="let s of symbols | symbolFilter:symbolFilter.value">{{s}}</a>
+          </div>
+        </li>
+      </ul>
+
+    </div>
+  </nav>
+
+  <div class="row">
+    <div class="col-12 col-md-9">
+      <div class="card">
+        <div class="card-header">
+          <b>Ticker (Range: 60 seconds)</b>
+        </div>
+        <div id="priceChart" style="height: 100px; width: 99%;"></div>
+      </div>
+    </div>
+    <div class="col-12 col-md-3 mt-2 mt-md-0">
+      <div class="card" style="padding-bottom: 0px; margin-bottom: 0px;">
+        <div class="card-header">
+          <b>Depth</b>
+        </div>
+        <div id="depthChart" style="height: 100px; width: 99%;"></div>
+      </div>
+    </div>
+  </div>
+
+  <br/>
+
+  <div class="row">
+    <div class="col">
+      <div class="table-responsive">
+        <table *ngIf="lastUpdate" class="table table-sm table-bordered">
+          <thead>
+          <tr>
+            <th>Last</th>
+            <th>Spread</th>
+            <th>24h %</th>
+            <th>1m %</th>
+            <th>5m %</th>
+            <th>10m %</th>
+            <th>15m %</th>
+            <th>60m %</th>
+          </tr>
+          </thead>
+          <tr>
+            <td>{{lastUpdate.close}}</td>
+            <td>{{(lastUpdate.ask - lastUpdate.bid) / lastUpdate.bid |
+              percent:".3"}}
+            </td>
+            <td>{{lastUpdate.price_change_pct["24h"]}}</td>
+            <td>{{lastUpdate.price_change_pct["1m"]}}</td>
+            <td>{{lastUpdate.price_change_pct["5m"]}}</td>
+            <td>{{lastUpdate.price_change_pct["10m"]}}</td>
+            <td>{{lastUpdate.price_change_pct["15m"]}}</td>
+            <td>{{lastUpdate.price_change_pct["1h"]}}</td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="table-responsive">
+        <table [hidden]="!lastUpdate || !lastUpdate.vwap_1m"
+               class="table table-sm table-bordered">
+          <thead>
+          <tr>
+            <th>VWAP 1m</th>
+            <th>VWAP 2m</th>
+            <th>VWAP 3m</th>
+            <th>VWAP 4m</th>
+            <th>VWAP 5m</th>
+            <th>VWAP 10m</th>
+            <th>VWAP 15m</th>
+            <th>VWAP 60m</th>
+          </tr>
+          </thead>
+          <tr *ngIf="lastUpdate && lastUpdate.vwap_1m">
+            <td>{{lastUpdate.vwap_1m | number:".8-8"}}</td>
+            <td>{{lastUpdate.vwap_2m | number:".8-8"}}</td>
+            <td>{{lastUpdate.vwap_3m | number:".8-8"}}</td>
+            <td>{{lastUpdate.vwap_4m | number:".8-8"}}</td>
+            <td>{{lastUpdate.vwap_5m | number:".8-8"}}</td>
+            <td>{{lastUpdate.vwap_10m | number:".8-8"}}</td>
+            <td>{{lastUpdate.vwap_15m | number:".8-8"}}</td>
+            <td>{{lastUpdate.vwap_60m | number:".8-8"}}</td>
+          </tr>
+        </table>
+      </div>
+
+    </div>
+    <div class="col">
+      <div class="table-responsive">
+        <table [hidden]="!lastUpdate" class="table table-sm table-bordered">
+          <thead>
+          <tr>
+            <th title="1D ATR (14, RMA)">ATR 1D</th>
+            <th title="1H ATR (14, RMA)" style="border-right: 3px solid;">ATR
+              1H
+            </th>
+            <th>1mR%</th>
+            <th>2mR%</th>
+            <th>3mR%</th>
+            <th>5mR%</th>
+            <th>10mR%</th>
+            <th>15mR%</th>
+            <th>60mR%</th>
+            <th>24hR%</th>
+          </tr>
+          </thead>
+          <tr *ngIf="lastUpdate">
+            <td>{{ATR['1d'] | number:".8-8"}}</td>
+            <td style="border-right: 3px solid;">{{ATR['1h'] | number:".8-8"}}
+            </td>
+            <td>{{lastUpdate.rp_1 | number:".2-2"}}</td>
+            <td>{{lastUpdate.rp_2 | number:".2-2"}}</td>
+            <td>{{lastUpdate.rp_3 | number:".2-2"}}</td>
+            <td>{{lastUpdate.rp_5 | number:".2-2"}}</td>
+            <td>{{lastUpdate.rp_10 | number:".2-2"}}</td>
+            <td>{{lastUpdate.rp_15 | number:".2-2"}}</td>
+            <td>{{lastUpdate.rp_60 | number:".2-2"}}</td>
+            <td>{{lastUpdate.rp_24 | number:".2-2"}}</td>
+          </tr>
+        </table>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-sm table-bordered">
+          <thead>
+          <tr>
+            <th title="Price range in past minute">1mR</th>
+            <th title="Price range in past 2 minutes">2mR</th>
+            <th title="Price range in past 3 minutes">3mR</th>
+            <th title="Price range in past 5 minutes">5mR</th>
+            <th title="Price range in past 10 minutes">10mR</th>
+            <th title="Price range in past 15 minutes">15mR</th>
+            <th title="Price range in past 60 minutes">60mR</th>
+            <th title="Price range in past 24 hours">24hR</th>
+          </tr>
+          </thead>
+          <tr *ngIf="lastUpdate">
+            <td>{{lastUpdate.r_1 | number:".8-8"}}</td>
+            <td>{{lastUpdate.r_2 | number:".8-8"}}</td>
+            <td>{{lastUpdate.r_3 | number:".8-8"}}</td>
+            <td>{{lastUpdate.r_5 | number:".8-8"}}</td>
+            <td>{{lastUpdate.r_10 | number:".8-8"}}</td>
+            <td>{{lastUpdate.r_15 | number:".8-8"}}</td>
+            <td>{{lastUpdate.r_60 | number:".8-8"}}</td>
+            <td>{{lastUpdate.r_24 | number:".8-8"}}</td>
+          </tr>
+        </table>
+
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col">
+      <div class="table-responsive">
+        <table *ngIf="lastUpdate" class="table table-sm table-bordered">
+          <thead>
+          <tr>
+            <th>1mV%</th>
+            <th>2mV%</th>
+            <th>3mV%</th>
+            <th>5mV%</th>
+            <th>10mV%</th>
+            <th>15mV%</th>
+            <th>60mV%</th>
+          </tr>
+          </thead>
+          <tr>
+            <td>{{lastUpdate.volume_change_pct["1m"]}}</td>
+            <td>{{lastUpdate.volume_change_pct["2m"]}}</td>
+            <td>{{lastUpdate.volume_change_pct["3m"]}}</td>
+            <td>{{lastUpdate.volume_change_pct["5m"]}}</td>
+            <td>{{lastUpdate.volume_change_pct["10m"]}}</td>
+            <td>{{lastUpdate.volume_change_pct["15m"]}}</td>
+            <td>{{lastUpdate.volume_change_pct["1h"]}}</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+    <div class="col">
+      <div class="table-responsive">
+        <table [hidden]="!lastUpdate" class="table table-sm table-bordered">
+          <thead>
+          <tr>
+            <th data-toggle="tooltip" title="1 minute volume">1mV</th>
+            <th title="5 minute volume">5mV</th>
+            <th title="10 minute volume">10mV</th>
+            <th title="15 minute volume">15mV</th>
+            <th title="60 minute volume">60mV</th>
+            <th title="24 hour volume">24hV</th>
+          </tr>
+          </thead>
+          <tr *ngIf="lastUpdate">
+            <td>{{lastUpdate.total_volume_1 | number:".3-3"}}</td>
+            <td>{{lastUpdate.total_volume_5 | number:".3-3"}}</td>
+            <td>{{lastUpdate.total_volume_10 | number:".3-3"}}</td>
+            <td>{{lastUpdate.total_volume_15 | number:".3-3"}}</td>
+            <td>{{lastUpdate.total_volume_60 | number:".3-3"}}</td>
+            <td>{{lastUpdate.volume | number:".3-3"}}</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+    <div class="col">
+      <div class="table-responsive">
+        <table [hidden]="!lastUpdate" class="table table-sm table-bordered">
+          <thead>
+          <tr>
+            <th>1mNv</th>
+            <th>2mNv</th>
+            <th>3mNv</th>
+            <th>4mNv</th>
+            <th>5mNv</th>
+            <th>10mNv</th>
+            <th>15mNv</th>
+            <th>60mNv</th>
+          </tr>
+          </thead>
+          <tr *ngIf="lastUpdate">
+            <td>{{lastUpdate.nv_1 | number:".3-3"}}</td>
+            <td>{{lastUpdate.nv_2 | number:".3-3"}}</td>
+            <td>{{lastUpdate.nv_3 | number:".3-3"}}</td>
+            <td>{{lastUpdate.nv_4 | number:".3-3"}}</td>
+            <td>{{lastUpdate.nv_5 | number:".3-3"}}</td>
+            <td>{{lastUpdate.nv_10 | number:".3-3"}}</td>
+            <td>{{lastUpdate.nv_15 | number:".3-3"}}</td>
+            <td>{{lastUpdate.nv_60 | number:".3-3"}}</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+
+    <div class="col">
+      <div class="card">
+        <div class="card-header">
+          <ul class="nav nav-pills">
+
+            <li class="nav-item mr-2">
+              <b>Candlesticks</b>
+            </li>
+
+            <li class="nav-item" *ngFor="let val of availableKlineIntervals">
+              <a class="nav-link" [ngClass]="{'active': val == klineInterval}"
+                 href="javascript:void(0);"
+                 (click)="changeInterval(val)">{{val}}</a>
+            </li>
+
+          </ul>
+
+        </div>
+        <div id="candleStickChart" style="height: 400px; width: 98%;"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="row mt-2">
+    <div class="col col-md-8">
+      <app-orderbook [bids]="orderBook.bids"
+                     [asks]="orderBook.asks"></app-orderbook>
+    </div>
+    <div class="col col-md-4">
+      <div class="card">
+        <div class="card-header">
+          <b>Trades (Last {{maxTradeHistory}})</b>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-sm" style="margin-bottom: 0px;">
+            <thead>
+            <tr>
+              <th>Price</th>
+              <th>Quantity</th>
+              <th>Time</th>
+            </tr>
+            </thead>
+            <tr *ngFor="let trade of trades"
+                [ngClass]="{'buy-trade': !trade.buyerMaker,
+                'sell-trade': trade.buyerMaker}">
+              <td>{{trade.price | number:".8"}}</td>
+              <td>{{trade.quantity}}</td>
+              <td>{{trade.timestamp | date:"hh:mm:ss"}}</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+

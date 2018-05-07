@@ -1,0 +1,234 @@
+<div class="container-fluid p-0 p-md-2">
+
+  <div *ngIf="exchange == 'kucoin'" class="jumbotron text-center mt-2"
+       style="padding: 0px; margin: 0px;">
+    If you use KuCoin, please consider letting me <a href="javascript:void(0);"
+                                                     data-toggle="modal"
+                                                     data-target="#aboutModal">know</a>.
+  </div>
+
+  <br/>
+
+  <div style="position: fixed; top: 2px; left: 25%; width: 50%; z-index: 5000;">
+    <div *ngIf="banner.show" [@bannerState]="banner.className"
+         class="text-center alert {{banner.className}}">
+      {{banner.message}}
+    </div>
+  </div>
+
+  <nav class="navbar navbar-expand-md navbar-light bg-light app-toolbar">
+    <button class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target=".app-toolbar-collapse" aria-controls="toolbarContent"
+            aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse app-toolbar-collapse"
+         id="toolbarContent">
+
+      <div class="col">
+        <div class="input-group input-group-sm">
+          <div class="input-group-prepend">
+            <div class="input-group-text">Base</div>
+          </div>
+          <select class="form-control" [(ngModel)]="config.base"
+                  (change)="render()">
+            <option *ngFor="let coin of baseTokens">{{coin}}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="input-group input-group-sm">
+          <div class="input-group-prepend">
+            <div class="input-group-text">Count</div>
+          </div>
+          <select class="form-control" [(ngModel)]="config.count"
+                  (change)="render()">
+            <option>25</option>
+            <option>50</option>
+            <option>100</option>
+            <option value="-1">All</option>
+          </select>
+        </div>
+
+      </div>
+
+      <div class="col">
+        <div class="input-group input-group-sm">
+          <div class="input-group-prepend">
+            <div class="input-group-text"><i class="fa fa-search"></i></div>
+          </div>
+          <input type="text" class="form-control" [(ngModel)]="config.filter">
+          <div class="input-group-append">
+            <button class="btn btn-secondary" (click)="config.filter=null">
+              <i class="fa fa-times-circle"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="dropdown">
+          <button class="btn btn-secondary dropdown-toggle btn-sm btn-block"
+                  type="button"
+                  id="dropdownSelectColumns" data-toggle="dropdown"
+                  aria-haspopup="true"
+                  aria-expanded="false">
+            Select Columns
+          </button>
+          <div class="dropdown-menu" aria-labelledby="dropdownSelectColumns"
+               style="width: 100%; max-height: 300px; height: auto; overflow-x: hidden;">
+            <a class="dropdown-item" href="javascript:void(0);"
+               style="width: 100%;"
+               (click)="showDefaultColumns(); saveConfig();">Default</a>
+            <a *ngFor="let col of headers" class="dropdown-item"
+               href="javascript:void(0)"
+               (click)="config.visibleColumns[col.name] = !config.visibleColumns[col.name]; saveConfig();">
+              <input type="checkbox"
+                     [(ngModel)]="config.visibleColumns[col.name]"
+                     (click)="saveConfig();">
+              {{col.title}}
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col d-none d-md-block">
+        <button class="btn btn-secondary btn-sm btn-block" type="button"
+                data-toggle="collapse"
+                data-target="#moreFilters" aria-expanded="false"
+                aria-controls="collapseExample">
+          More...
+        </button>
+      </div>
+
+    </div>
+
+  </nav>
+
+  <div class="collapse app-toolbar-collapse" id="moreFilters">
+    <nav class="navbar navbar-light bg-light app-toolbar">
+
+      <div class="col-md">
+        <div class="input-group input-group-sm">
+          <div class="input-group-prepend">
+            <div class="input-group-text">Min Price</div>
+          </div>
+          <input type="text" class="form-control"
+                 [(ngModel)]="config.minPrice">
+          <div class="input-group-append">
+            <button class="btn btn-secondary" (click)="config.minPrice=null">
+              <i class="fa fa-times-circle"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md">
+        <div class="input-group input-group-sm mt-2 mt-md-0">
+          <div class="input-group-prepend">
+            <div class="input-group-text">Max Price</div>
+          </div>
+          <input type="text" class="form-control"
+                 [(ngModel)]="config.maxPrice">
+          <div class="input-group-append">
+            <button class="btn btn-secondary" (click)="config.maxPrice=null">
+              <i class="fa fa-times-circle"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg">
+        <div class="input-group input-group-sm mt-2 mt-lg-0">
+          <div class="input-group-prepend">
+            <div class="input-group-text">Max 24h Change</div>
+          </div>
+          <input type="text" class="form-control"
+                 [(ngModel)]="config.max24Change">
+          <div class="input-group-append">
+            <button class="btn btn-secondary"
+                    (click)="config.max24Change=null">
+              <i class="fa fa-times-circle"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg">
+        <div class="input-group input-group-sm mt-2 mt-lg-0">
+          <div class="input-group-prepend">
+            <div class="input-group-text">Min 24h Change</div>
+          </div>
+          <input type="text" class="form-control"
+                 [(ngModel)]="config.min24Change">
+          <div class="input-group-append">
+            <button class="btn btn-secondary"
+                    (click)="config.min24Change=null">
+              <i class="fa fa-times-circle"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </nav>
+  </div>
+  <br/>
+
+  <span class="float-right">Last update: {{idleTime | number:"1.0-0"}} seconds
+    ago.</span>
+
+  <div class="table-responsive">
+    <mdz-double-scroll>
+      <table class="table table-sm table-bordered table-hover">
+        <tr>
+          <td></td>
+          <th app-th-sortable *ngFor="let header of headers"
+              (click)="sortBy(header.name)"
+              [name]="header.name" [sortBy]="config.sortBy"
+              [sortOrder]="config.sortOrder"
+              [ngStyle]="{'background': header.name == config.sortBy ? 'gainsboro' : ''}"
+              [hidden]="config.visibleColumns[header.name] != true">
+            {{header.title}}
+          </th>
+        </tr>
+        <tr *ngFor="let ticker of tickers; let i = index; trackBy: trackBy"
+            (mouseenter)="mouseEnter(i);" (mouseleave)="mouseEnter(null)">
+          <td>
+            <input type="checkbox" class="float-right" style="margin-top: 4px;"
+                   [(ngModel)]="config.watching[ticker.symbol]"
+                   (change)="saveConfig();">
+          </td>
+          <td *ngFor="let col of headers;"
+              [hidden]="config.visibleColumns[col.name] != true"
+              style="white-space: nowrap"
+              [ngStyle]="{'background': col.name == config.sortBy ? 'gainsboro' : ''}">
+            <span [ngSwitch]="col.type"
+                  [ngClass]="{'up': col.updown && ticker[col.name] > 0,
+                            'down': col.updown && ticker[col.name] < 0}">
+              <span *ngSwitchCase="'percent'"
+                    [ngClass]="{'up': ticker[col.name] > 0,
+                  'down': ticker[col.name] < 0}">
+                {{ticker[col.name] | percent:col.format }}
+              </span>
+              <span *ngSwitchCase="'percent-number'"
+                    [ngClass]="{'up': ticker[col.name] > 0,
+                  'down': ticker[col.name] < 0}">
+                {{ticker[col.name] | number:".2-2" }}
+              </span>
+              <span *ngSwitchCase="'number'">
+                {{ticker[col.name] | number:col.format }}
+              </span>
+              <span *ngSwitchDefault>
+                <a *ngIf="col.routerLink"
+                   [routerLink]="[col.routerLink, ticker[col.name]]">{{ticker[col.name]}}</a>
+                <span *ngIf="!col.routerLink">{{ticker[col.name]}}</span>
+              </span>
+            </span>
+          </td>
+        </tr>
+      </table>
+    </mdz-double-scroll>
+  </div>
+</div>

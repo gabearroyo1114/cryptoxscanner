@@ -1,0 +1,12 @@
+{
+    "/api": {
+	"target": "https://crankykernel.com",
+	"secure": true
+    },
+    "/ws/*": {
+	"target": "wss://crankykernel.com",
+	"secure": false,
+	"ws": true,
+	"changeOrigin": true
+    }
+}

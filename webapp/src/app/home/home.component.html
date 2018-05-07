@@ -1,0 +1,188 @@
+<div class="container">
+
+  <br/>
+
+  <div class="row">
+    <div class="col">
+      <a [routerLink]="['/binance/monitor']" type="button" href="" role="button"
+         class="btn btn-secondary btn-block">Binance Gainers/Losers</a>
+    </div>
+  </div>
+
+  <br/>
+
+  <div class="row">
+    <div class="col">
+      <a [routerLink]="['/binance/screener']" type="button" href=""
+         role="button"
+         class="btn btn-secondary btn-block">Binance Live</a>
+    </div>
+  </div>
+
+  <br/>
+
+  <div class="row">
+    <div class="col">
+      <a [routerLink]="['/kucoin/monitor']" type="button" href=""
+         role="button"
+         class="btn btn-secondary btn-block">KuCoin Gainers/Losers</a>
+    </div>
+  </div>
+
+  <br/>
+
+  <div class="row">
+    <div class="col">
+      <a [routerLink]="['/kucoin/live']" type="button" href=""
+         role="button"
+         class="btn btn-secondary btn-block">KuCoin Live</a>
+    </div>
+  </div>
+
+  <br/>
+
+  <div class="card border-info">
+    <div class="card-header align-content-center">
+      Updates
+    </div>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <b>2018-05-07</b>
+        <ul>
+          <li>Source code is now available on <a
+              href="https://github.com/crankykernel/cryptoxscanner">GitHub</a>.
+          </li>
+          <li>Issue tracker also moved to <a
+              href="https://github.com/crankykernel/cryptoxscanner/issues">GitHub</a>.
+          </li>
+        </ul>
+      </li>
+      <li class="list-group-item">
+        <b>2018-05-02</b>
+        <ul>
+          <li>Separate the gain and drop alerts from each other, eaching having
+            their own percentage threshold.
+          </li>
+          <li>
+            Add a minimum 24h volume to the alert conditions.
+          </li>
+          <li>
+            Add a volume alert which is based on a percentage change relative to
+            the 24 hour volume over a smaller interval of time.
+          </li>
+          <li>
+            Remove the count option on the gainers/losers/volume tables in
+            preparation for filtering these server side to reduce bandwidth.
+          </li>
+        </ul>
+      </li>
+      <li class="list-group-item">
+        <b>2018-04-30</b>
+        <ul>
+          <li>On the symbol page hit the <b>/</b> key to quickly change to
+            another symbol.
+          </li>
+          <li class="invalid">
+            <a href="https://trello.com/b/scgoN2SC/crypto-monitor">Trello</a>
+          </li>
+          <li class="invalid">
+            <a href="https://gitlab.com/crankykernel/tokenfx/issues">Issue
+              Tracker</a>
+          </li>
+        </ul>
+      </li>
+      <li class="list-group-item">
+        <b>2018-04-24</b>
+        <ul>
+          <li>The top gainers and losers on the <a
+              [routerLink]="['/binance/monitor']">monitor</a> will display the
+            top 10 gainers and losers instead of just those matching the
+            filters. Gainers and losers matching the filters will appear in the
+            alerts panel.
+          </li>
+          <li>Added 2m, 3m and 4m net volume to the <a
+              [routerLink]="['/binance/live']">live</a> views.
+          </li>
+          <li>Added desktop notifications for alerts.</li>
+        </ul>
+      </li>
+      <li class="list-group-item">
+        <b>2018-04-23</b>
+        <ul>
+          <li>Remove donation links.</li>
+          <li>
+            The <b>top gainers</b> and <b>top losers</b> now display the top 10
+            (default) losers and gainers instead of just those that have broke
+            the threshold. The alert panel above the <i>top</i> tables will
+            display
+            those that have broke the thresholds, so I found these tables better
+            used to display the current state of the market.
+          </li>
+        </ul>
+      </li>
+      <li class="list-group-item">
+        <b>2018-04-20</b>
+        <ul>
+          <li>Remove Google Analytics. Most of you are blocking it anyways.</li>
+        </ul>
+      </li>
+      <li class="list-group-item">
+        <b>2018-04-18</b>
+        <ul>
+          <li>Added basic charts for Binance symbols.</li>
+        </ul>
+      </li>
+      <li class="list-group-item">
+        <b>2018-04-08</b>
+        <ul>
+          <li>Automatically purge alerts that are an hour old and the price no
+            longer matches the threshold.
+          <li>
+            On the live display, add a check box that will "watch" a symbol by
+            keeping it pinned to the top.
+          </li>
+        </ul>
+      </li>
+      <li class="list-group-item">
+        <b>2018-04-07</b>
+        <ul>
+          <li>Trying out price based alerts on the monitor screens. When a
+            price
+            gains or looses more than the threshold it will pop up in the
+            alert
+            display and stay there until cleared.
+            <br/>
+            The alert panel is easily disabled if its annoying, and its
+            still a
+            work in progress.
+          </li>
+        </ul>
+      </li>
+      <li class="list-group-item">
+        <b>2018-04-04</b>
+        <ul>
+          <li>Allow the columes you want to see/hide in the "live" view to
+            be
+            configured.
+          </li>
+          <li>Added net volume to the "Binance Live" view. The net
+            volume is the sell volume subtracted from the buy volume.
+            Inspired
+            by <a href="https://twitter.com/CryptoZyzz">CryptoZyzz</a>'s work
+            at
+            <a href="https://agile-cliffs-23967.herokuapp.com/binance">https://agile-cliffs-23967.herokuapp.com/binance</a>.
+            The goal is to work it into some sort of alert/indicator.
+            <br/>
+            Unfortunately net volume is not persisted between restarts of
+            the
+            backend due to lack of memory on the server. This will be
+            addressed
+            soon.
+          </li>
+          <li>Make the columns on the "monitor" views sortable.</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+</div>

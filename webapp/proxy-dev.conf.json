@@ -1,0 +1,19 @@
+{
+  "/api": {
+    "target": "http://localhost:6035",
+    "secure": false
+  },
+  "/ws": {
+    "target": "ws://localhost:6035",
+    "secure": false,
+    "ws": true
+  },
+  "/proxy/binance/stream": {
+    "target": "wss://stream.binance.com:9443",
+    "secure": false,
+    "ws": true,
+    "pathRewrite": {
+      "^/proxy/binance/stream": ""
+    }
+  }
+}

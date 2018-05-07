@@ -1,0 +1,47 @@
+<div class="row">
+
+  <div class="col">
+
+    <div class="card">
+      <div class="card-header">
+        Asks
+      </div>
+
+      <table class="table table-sm" style="margin-bottom: 0px;">
+        <thead>
+        <tr>
+          <th>Price</th>
+          <th>Amount</th>
+        </tr>
+        </thead>
+        <tr *ngFor="let ask of asks" class="asks"
+            [ngClass]="{'over': ask[1] > averageAskAmount}">
+          <td>{{ask[0] | number:".8-8"}}</td>
+          <td>{{ask[1] | number:".8-8"}}</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="col">
+    <div class="card">
+      <div class="card-header">
+        Bids
+      </div>
+      <table class="table table-sm" style="margin-bottom: 0px;">
+        <thead>
+        <tr>
+          <th>Price</th>
+          <th>Amount</th>
+        </tr>
+        </thead>
+        <tr *ngFor="let bid of bids" class="bids"
+            [ngClass]="{'over': bid[1] > averageBidAmount}">
+          <td>{{bid[0] | number:".8-8"}}</td>
+          <td>{{bid[1] | number:".8-8"}}</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+</div>

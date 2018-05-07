@@ -1,0 +1,600 @@
+<div style="position: fixed; top: 2px; left: 25%; width: 50%; z-index: 5000;">
+  <div *ngIf="banner.show" [@bannerState]="banner.className"
+       class="text-center alert {{banner.className}}"
+       [innerHtml]="banner.message">
+  </div>
+</div>
+
+<div class="container-fluid">
+
+  <div *ngIf="exchange == 'kucoin'" class="jumbotron text-center mt-2"
+       style="padding: 0px; margin: 0px;">
+    If you use KuCoin, please consider letting me <a href="javascript:void(0);"
+                                                     data-toggle="modal"
+                                                     data-target="#exampleModal">know</a>.
+  </div>
+
+  <nav class="navbar navbar-expand-lg navbar-light bg-light mt-2 mb-2">
+    <span class="navbar-brand">Monitor</span>
+
+    <button class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target=".app-toolbar-collapse"
+            aria-controls="toolbarOne" aria-expanded="false"
+            aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div
+        class="collapse navbar-collapse justify-content-end app-toolbar-collapse"
+        id="toolbarOne">
+
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <div class="input-group input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text">Base</span>
+            </div>
+            <select class="form-control" name="config.baseCoin"
+                    [(ngModel)]="config.baseCoin" (change)="saveConfig();">
+              <option *ngFor="let coin of baseCoins">{{coin}}</option>
+            </select>
+          </div>
+        </li>
+
+      </ul>
+
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <button type="button" class="btn btn-outline-secondary"
+                  (click)="showAlertConfiguration=!showAlertConfiguration">
+            Configure Alerts
+          </button>
+        </li>
+
+        <li class="nav-item">
+          <span class="nav-link">Pairs: {{pairCount}}</span>
+        </li>
+
+        <li class="nav-item">
+          <span class="nav-link">
+            Last update:<span [ngStyle]="{'color': bullsEyeColor}">
+            {{idleTime | number:"1.0-0"}} seconds ago.</span>
+          </span>
+        </li>
+
+      </ul>
+    </div>
+
+  </nav>
+
+  <!-- Alert Configuration. -->
+  <div *ngIf="showAlertConfiguration">
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <button class="navbar-toggler" type="button" data-toggle="collapse"
+              data-target="#navbarAlertConfigContent"
+              aria-controls="navbarAlertConfigContent" aria-expanded="false"
+              aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarAlertConfigContent">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item">
+            <a class="nav-link"
+               href="javascript:void(0)"
+               (click)="toggleDesktopNotifications();">
+              <input type="checkbox"
+                     [(ngModel)]="config.alerts.desktopNotifications"
+                     (change)="saveConfig();">
+              Desktop Notifications
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link"
+               href="javascript:void(0)"
+               (click)="config.alerts.sound = !config.alerts.sound; saveConfig();">
+              <input type="checkbox" [(ngModel)]="config.alerts.sound"
+                     (change)="saveConfig();">
+              Sounds
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="row mb-2">
+      <div class="col-12 col-lg">
+        <div class="card">
+          <div class="card-header">
+            Drop Alerts
+          </div>
+          <div class="card-body">
+            <form>
+              <div class="form-group row">
+                <button *ngIf="!config.alerts.drop.enabled" type="btn"
+                        class="btn btn-secondary btn-block btn-sm"
+                        (click)="config.alerts.drop.enabled=true; saveConfig();">
+                  Enable
+                </button>
+                <button *ngIf="config.alerts.drop.enabled" type="btn"
+                        class="btn btn-primary btn-block btn-sm"
+                        (click)="config.alerts.drop.enabled=false; saveConfig();">
+                  Enabled
+                </button>
+              </div>
+              <div class="form-group row">
+                <label
+                    class="col-sm-3 col-form-label col-form-label-sm">Window</label>
+                <div class="col-sm-9">
+                  <div class="input-group input-group-sm">
+                    <select class="form-control form-control-sm"
+                            name="dropAlertsWindow"
+                            [(ngModel)]="config.alerts.drop.window">
+                      <option>1m</option>
+                      <option>5m</option>
+                      <option>10m</option>
+                      <option>15m</option>
+                      <option>1h</option>
+                    </select>
+                    <div class="input-group-append">
+                      <label class="input-group-text">minutes</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label col-form-label-sm">Drop
+                  %</label>
+                <div class="col-sm-9">
+                  <div class="input-group input-group-sm">
+                    <input type="number" class="form-control"
+                           name="dropAlertsPercent"
+                           (change)="saveConfig();"
+                           [(ngModel)]="config.alerts.drop.percent">
+                    <div class="input-group-append">
+                      <button type="button"
+                              class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split no-radius"
+                              data-toggle="dropdown" aria-haspopup="true"
+                              aria-expanded="false">
+                      </button>
+                      <div class="dropdown-menu dropdown-menu-right">
+                        <a *ngFor="let p of [1, 1.5, 2, 2.5, 3, 5, 7, 10, 15]"
+                           class="dropdown-item"
+                           href="javascript:void(0)"
+                           (click)="config.alerts.drop.percent=p; saveConfig();">{{p}}</a>
+                      </div>
+                      <label class="input-group-text">%</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group row">
+                <label
+                    class="col-sm-3 col-form-label col-form-label-sm">Volume</label>
+                <div class="col-sm-5">
+                  <div class="input-group input-group-sm">
+                    <input type="number" class="form-control"
+                           name="dropAlertsVolume"
+                           [(ngModel)]="config.alerts.drop.volume"
+                           (change)="saveConfig()">
+                    <div class="input-group-append">
+                      <label
+                          class="input-group-text">{{config.baseCoin}}</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-4">
+                  <select class="form-control form-control-sm"
+                          name="dropAlertsVolumeWindow"
+                          [(ngModel)]="config.alerts.drop.volumeRange"
+                          (change)="saveConfig();">
+                    <option>24h</option>
+                  </select>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 col-lg">
+        <div class="card">
+          <div class="card-header">
+            Gain Alerts
+          </div>
+          <div class="card-body">
+            <form>
+              <div class="form-group row">
+                <button *ngIf="!config.alerts.gain.enabled" type="btn"
+                        class="btn btn-secondary btn-block btn-sm"
+                        (click)="config.alerts.gain.enabled=true; saveConfig();">
+                  Enable
+                </button>
+                <button *ngIf="config.alerts.gain.enabled" type="btn"
+                        class="btn btn-primary btn-block btn-sm"
+                        (click)="config.alerts.gain.enabled=false; saveConfig();">
+                  Enabled
+                </button>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label col-form-label-sm">Window</label>
+                <div class="col-sm-9">
+                  <div class="input-group input-group-sm">
+                    <select class="form-control form-control-sm" name="dropAlertsWindow"
+                            [(ngModel)]="config.alerts.gain.window"
+                            (change)="saveConfig();">
+                      <option>1m</option>
+                      <option>5m</option>
+                      <option>10m</option>
+                      <option>15m</option>
+                      <option>1h</option>
+                    </select>
+                    <div class="input-group-append">
+                      <label class="input-group-text">minutes</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label col-form-label-sm">Gain %</label>
+                <div class="col-sm-9">
+                  <div class="input-group input-group-sm">
+                    <input type="number" class="form-control"
+                           name="dropAlertsPercent"
+                           (change)="saveConfig();"
+                           [(ngModel)]="config.alerts.gain.percent">
+                    <div class="input-group-append">
+                      <button type="button"
+                              class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split no-radius"
+                              data-toggle="dropdown" aria-haspopup="true"
+                              aria-expanded="false">
+                      </button>
+                      <div class="dropdown-menu dropdown-menu-right">
+                        <a *ngFor="let p of [1, 1.5, 2, 2.5, 3, 5, 7, 10, 15]"
+                           class="dropdown-item"
+                           href="javascript:void(0)"
+                           (click)="config.alerts.gain.percent=p; saveConfig();">{{p}}</a>
+                      </div>
+                      <label class="input-group-text">%</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label col-form-label-sm">Volume</label>
+                <div class="col-sm-5">
+                  <div class="input-group input-group-sm">
+                    <input type="number" class="form-control"
+                           name="dropAlertsVolume"
+                           [(ngModel)]="config.alerts.gain.volume"
+                           (change)="saveConfig()">
+                    <div class="input-group-append">
+                      <label
+                          class="input-group-text">{{config.baseCoin}}</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-4">
+                  <select class="form-control form-control-sm" name="dropAlertsVolumeWindow"
+                          [(ngModel)]="config.alerts.gain.volumeRange"
+                          (change)="saveConfig();">
+                    <option>24h</option>
+                  </select>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 col-lg">
+        <div class="card">
+          <div class="card-header">
+            Volume Alerts
+          </div>
+          <div class="card-body">
+            <form>
+              <div class="form-group row">
+                <button *ngIf="!config.alerts.volume.enabled" type="btn"
+                        class="btn btn-secondary btn-block btn-sm"
+                        (click)="config.alerts.volume.enabled=true; saveConfig();">
+                  Enable
+                </button>
+                <button *ngIf="config.alerts.volume.enabled" type="btn"
+                        class="btn btn-primary btn-block btn-sm"
+                        (click)="config.alerts.volume.enabled=false; saveConfig();">
+                  Enabled
+                </button>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label col-form-label-sm">Window</label>
+                <div class="col-sm-9">
+                  <div class="input-group input-group-sm">
+                    <select class="custom-select" name="dropAlertsWindow"
+                            (change)="saveConfig();"
+                            [(ngModel)]="config.alerts.volume.window">
+                      <option>1m</option>
+                      <option>5m</option>
+                      <option>10m</option>
+                      <option>15m</option>
+                      <option>1h</option>
+                    </select>
+                    <div class="input-group-append">
+                      <label class="input-group-text">minutes</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label col-form-label-sm">Gain %</label>
+                <div class="col-sm-9">
+                  <div class="input-group input-group-sm">
+                    <input type="number" class="form-control"
+                           name="dropAlertsPercent"
+                           (change)="saveConfig();"
+                           [(ngModel)]="config.alerts.volume.percent">
+                    <div class="input-group-append">
+                      <button type="button"
+                              class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split no-radius"
+                              data-toggle="dropdown" aria-haspopup="true"
+                              aria-expanded="false">
+                      </button>
+                      <div class="dropdown-menu dropdown-menu-right">
+                        <a *ngFor="let p of [1, 1.5, 2, 2.5, 3, 5, 7, 10, 15]"
+                           class="dropdown-item"
+                           href="javascript:void(0)"
+                           (click)="config.alerts.volume.percent=p; saveConfig();">{{p}}</a>
+                      </div>
+                      <label class="input-group-text">%</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <!-- -->
+
+  <!-- Alerts. --->
+  <div class="row mb-2"
+       *ngIf="config.alerts.drop.enabled ||
+       config.alerts.gain.enabled ||
+       config.alerts.volume.enabled">
+
+    <div class="col">
+
+      <div class="card">
+        <div class="card-header">
+          <span style="font-weight: bold">Alerts</span>
+          <span class="float-right">
+
+            <small>
+              <a href="javascript:void(0)"
+                 (click)="clearAlerts()">
+                Clear
+              </a>
+            </small>
+
+            <button *ngIf="!config.alerts.desktopNotifications" class="ml-2"
+                    (click)="toggleDesktopNotifications()"
+                    style="border: 0; background: transparent; padding: 0px; margin: 0px;">
+              <span
+                  class="far fa-bell"></span>
+            </button>
+            <button *ngIf="config.alerts.desktopNotifications" class="ml-2"
+                    (click)="toggleDesktopNotifications()"
+                    style="border: 0; background: transparent; padding: 0px; margin: 0px;">
+              <span
+                  class="fas fa-bell"></span>
+            </button>
+
+          </span>
+        </div>
+        <div *ngIf="alertArray && alertArray.length > 0"
+             class="table-responsive">
+          <table class="table table-striped table-sm">
+            <tr>
+              <th>Timestamp</th>
+              <th>Symbol</th>
+              <th>Trigger</th>
+              <th>24h Vol</th>
+              <th></th>
+            </tr>
+            <tr *ngFor="let alert of alertArray; let i = index;"
+                [ngClass]="{'table-danger': alert.type == 'drop',
+                'table-success': alert.type == 'gain',
+                'table-primary': alert.type == 'volume'}">
+              <td>{{alert.timestamp | date:"medium"}}</td>
+              <td *ngIf="hasCharts"><a
+                  [routerLink]="['/binance/symbol', alert.ticker.symbol]"
+                  target="_blank">{{alert.ticker.symbol}}</a>
+              </td>
+              <td *ngIf="!hasCharts">{{alert.ticker.symbol}}</td>
+              <td>{{alert.trigger}}</td>
+              <td>{{alert.ticker.volume | number:".2-2"}}</td>
+              <td>
+                <span class="float-right">
+                  <button (click)="removeAlert(i);"
+                          style="background: transparent; border: 0px; padding: 0px; margin: 0px;"
+                          type="button"><i class="fas fa-trash"></i>
+                  </button>
+                </span>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="row">
+
+    <div class="col-12 col-xl">
+
+      <div class="card mb-3">
+        <div class="card-header bg-success">
+          <b>Top Gainers</b>
+          <span class="float-right">
+            <select [(ngModel)]="config.gainers.range" (change)="saveConfig();"
+                    style="border: 0px; background: transparent;">
+              <option>1m</option>
+              <option>5m</option>
+              <option>10m</option>
+              <option>15m</option>
+              <option>1h</option>
+            </select>
+            <button style="border: 0px; background: transparent;"
+                    data-container="body" data-toggle="popover"
+                    id="gainersTablePopover"
+                    data-placement="left">
+              <span href="javascript:void(0)" class="fas fa-question-circle"
+                    style="cursor: pointer;">
+              </span>
+            </button>
+          </span>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-striped table-sm">
+            <tr>
+              <ng-template ngFor let-col [ngForOf]="gainersTableConfig.columns">
+                <th
+                    app-th-sortable [name]="col.field"
+                    [sortBy]="config.gainers.sortBy"
+                    [sortOrder]="config.gainers.sortOrder"
+                    (click)="sortBy('gainers', col.field)">
+                  {{col.title}}
+                </th>
+              </ng-template>
+            </tr>
+            <tr *ngFor="let item of gainers">
+              <td *ngIf="hasCharts"><a
+                  [routerLink]="['/binance/symbol', item.symbol]"
+                  target="_blank">{{item.symbol}}</a>
+              </td>
+              <td *ngIf="!hasCharts">{{item.symbol}}</td>
+              <td>
+                {{item.priceChangePercent | number:'.2'}}
+              </td>
+              <td>{{item.priceChangePercent24 | number:".2"}}</td>
+              <td>{{item.volumeChangePercent | number:".2"}}
+              </td>
+              <td>{{item.volume | number:".2"}}</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-xl">
+      <div class="card mb-3">
+        <div class="card-header bg-warning">
+          <b>Top Losers</b>
+          <span class="float-right">
+            <select [(ngModel)]="config.losers.range" (change)="saveConfig();"
+                    style="border: 0px; background: transparent;">
+              <option>1m</option>
+              <option>5m</option>
+              <option>10m</option>
+              <option>15m</option>
+              <option>1h</option>
+            </select>
+            <button style="border: 0px; background: transparent;"
+                    data-container="body" data-toggle="popover"
+                    id="losersTablePopover"
+                    data-placement="left">
+              <span href="javascript:void(0)" class="fas fa-question-circle"
+                    style="cursor: pointer;">
+              </span>
+            </button>
+          </span>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-striped table-sm">
+            <tr>
+              <ng-template ngFor let-col [ngForOf]="losersTableConfig.columns">
+                <th
+                    app-th-sortable [name]="col.field"
+                    [sortBy]="config.losers.sortBy"
+                    [sortOrder]="config.losers.sortOrder"
+                    (click)="sortBy('losers', col.field)">
+                  {{col.title}}
+                </th>
+              </ng-template>
+            </tr>
+            <tr *ngFor="let item of losers">
+              <td *ngIf="hasCharts"><a
+                  [routerLink]="['/binance/symbol', item.symbol]"
+                  target="_blank">{{item.symbol}}</a>
+              </td>
+              <td *ngIf="!hasCharts">{{item.symbol}}</td>
+              <td>
+                {{item.priceChangePercent | number:'.2'}}
+              </td>
+              <td>{{item.priceChangePercent24 | number:".2"}}</td>
+              <td>{{item.volumeChangePercent | number:".2"}}
+              </td>
+              <td>{{item.volume | number:".2"}}</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-xl">
+      <div class="card">
+        <div class="card-header">
+          <b>Top Volume Gainers</b>
+          <span class="float-right">
+            <select [(ngModel)]="config.volume.range" (change)="saveConfig();"
+                    style="border: 0px; background: transparent;">
+              <option>1m</option>
+              <option>5m</option>
+              <option>10m</option>
+              <option>15m</option>
+              <option>1h</option>
+            </select>
+            <button style="border: 0px; background: transparent;"
+                    data-container="body" data-toggle="popover"
+                    data-placement="left"
+                    data-content="Top volume gainers within time window. Only positive volume changes are shown. None of the price filters above are applied.">
+              <span href="javascript:void(0)" class="fas fa-question-circle"
+                    style="cursor: pointer;">
+              </span>
+            </button>
+          </span>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-striped table-sm">
+            <tr>
+              <ng-template ngFor let-col [ngForOf]="volumeTableConfig.columns">
+                <th
+                    app-th-sortable [name]="col.field"
+                    [sortBy]="config.volume.sortBy"
+                    [sortOrder]="config.volume.sortOrder"
+                    (click)="sortBy('volume', col.field)">
+                  {{col.title}}
+                </th>
+              </ng-template>
+            </tr>
+            <tr *ngFor="let item of byVolume">
+              <td *ngIf="hasCharts"><a
+                  [routerLink]="['/binance/chart', item.symbol]"
+                  target="_blank">{{item.symbol}}</a>
+              </td>
+              <td *ngIf="!hasCharts">{{item.symbol}}</td>
+              <td>{{item.priceChangePercent | number:".3-3"}}</td>
+              <td>{{item.volumeChangePercent | number:".3-3"}}</td>
+              <td>{{item.volume | number:".3-3"}}</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

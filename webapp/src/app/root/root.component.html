@@ -1,0 +1,102 @@
+<nav class="navbar fixed-top navbar-expand-sm navbar-dark bg-dark">
+
+  <a class="navbar-brand" [routerLink]="['/']" active="false">
+    Token Monitor</a>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse"
+          data-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent" aria-expanded="false"
+          aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+
+  <div class="collapse navbar-collapse justify-content-end"
+       id="navbarSupportedContent">
+
+    <ul class="navbar-nav mr-auto">
+
+      <li class="nav-item" [routerLink]="['/binance/monitor']"
+          [routerLinkActive]="['active']">
+        <a class="nav-link" [routerLink]="['/binance/monitor']">Binance
+          Monitor</a>
+      </li>
+      <li class="nav-item" [routerLink]="['/binance/live']"
+          [routerLinkActive]="['active']">
+        <a class="nav-link" [routerLink]="['/binance/live']">Binance
+          Live</a>
+      </li>
+      <li class="nav-item" [routerLink]="['/kucoin/monitor']"
+          [routerLinkActive]="['active']">
+        <a class="nav-link" [routerLink]="['/kucoin/monitor']">KuCoin
+          Monitor</a>
+      </li>
+      <li class="nav-item" [routerLink]="['/kucoin/screener']"
+          [routerLinkActive]="['active']">
+        <a class="nav-link" [routerLink]="['/kucoin/screener']">KuCoin
+          Live</a>
+      </li>
+    </ul>
+
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a href="https://twitter.com/crankykernel" target="_blank"
+           class="nav-link">Follow <i class="fab fa-twitter"></i></a>
+      </li>
+      <li class="nav-item">
+        <a href="https://twitter.com/intent/tweet?text=Binance%20Monitor%20-%20https://crankykernel.com/binance"
+           class="nav-link" target="_blank">Share <i class="fab fa-twitter"></i></a>
+      </li>
+      <li class="nav-item">
+        <a href="https://github.com/crankykernel/cryptoxscanner"
+           target="_blank" title="GitHub"
+           class="nav-link"><i class="fab fa-github"></i></a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="javascript:void(0);" data-toggle="modal"
+           data-target="#aboutModal">About</a>
+      </li>
+
+    </ul>
+  </div>
+
+</nav>
+
+<router-outlet></router-outlet>
+
+<!-- Modal -->
+<div class="modal fade" id="aboutModal" tabindex="-1" role="dialog"
+     aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Contact</h5>
+        <button type="button" class="close" data-dismiss="modal"
+                aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <dl>
+          <dt>Issue Tracker</dt>
+          <dd><a href="https://github.com/crankykernel/cryptoxscanner/issues"><i class="fab fa-github"></i> GitHub</a></dd>
+          <dt></dt>
+          <dt>Email</dt>
+          <dd><a href="mailto:thecrankykernel@gmail.com">thecrankykernel@gmail.com</a>
+          </dd>
+          <dt>Twitter</dt>
+          <dd><a href="https://twitter.com/crankykernel"
+                 target="_blank">@crankykernel</a></dd>
+          <dt>Telegram</dt>
+          <dd><a href="https://t.me/crankykernel">@crankykernel</a></dd>
+        </dl>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-block"
+                data-dismiss="modal">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
