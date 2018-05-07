@@ -4,17 +4,17 @@ before_script:
   - yum -y install git make
   - mkdir -p /go/src/github.com/crankykernel/cryptoxscanner
   - cp -a . /go/src/github.com/crankykernel/cryptoxscanner
-  - pwd
-  - (cd /tmp)
-  - pwd
+  - curl -o /tmp/go.tar.gz -L \
+        https://dl.google.com/go/go1.10.2.linux-amd64.tar.gz
+  - (cd /usr/local && tar xvf /tmp/go.tar.gz)
 
 build:
   script: |
-    curl -o /tmp/go.tar.gz -L https://dl.google.com/go/go1.10.2.linux-amd64.tar.gz
-    (
-      cd /usr/local
-      tar zxf /tmp/go.tar.gz
-    )
+    # curl -o /tmp/go.tar.gz -L https://dl.google.com/go/go1.10.2.linux-amd64.tar.gz
+    # (
+    #   cd /usr/local
+    #   tar zxf /tmp/go.tar.gz
+    # )
     export GOPATH=/go
     export PATH=$GOPATH/bin:/usr/local/go/bin:$PATH
     go version
