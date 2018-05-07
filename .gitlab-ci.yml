@@ -2,10 +2,12 @@ image: centos:7
 
 build:
   script: |
-    curl -o /tmp/go.tar.gz -L \
-        https://dl.google.com/go/go1.10.2.linux-amd64.tar.gz
+    ls
+    pwd
+    
+    curl -o /tmp/go.tar.gz -L https://dl.google.com/go/go1.10.2.linux-amd64.tar.gz
     cd /usr/local
-    tar zxvf /tmp/go.tar.gz
+    tar zxf /tmp/go.tar.gz
     export PATH=/usr/local/go/bin:$PATH
     go version
     go env
