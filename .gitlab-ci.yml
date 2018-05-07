@@ -2,8 +2,8 @@ image: centos:7
 
 build:
   script: |
-    ls
-    pwd
+    mkdir -p /go/src/github.com/crankykernel/cryptoxscanner
+    cp -a . /go/src/github.com/crankykernel/cryptoxscanner
     
     curl -o /tmp/go.tar.gz -L https://dl.google.com/go/go1.10.2.linux-amd64.tar.gz
     cd /usr/local
@@ -12,6 +12,7 @@ build:
     go version
     go env
     cd ~
+    export GOPATH=/go
 
     curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
     export NVM_DIR="$HOME/.nvm"
@@ -19,11 +20,12 @@ build:
     nvm install --lts
     nvm use --lts
 
-    ls
-    pwd
+    cd /go/src/github.com/crankykernel/cryptoxscanner
+    make
+    (cd webapp && make)
 
-    make dist
-    cp dist/*.zip ${CI_PROJECT_DIR}
+    # make dist
+    # cp dist/*.zip ${CI_PROJECT_DIR}
 
   artifacts:
     paths:
