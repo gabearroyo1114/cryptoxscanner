@@ -1,0 +1,30 @@
+image: centos:7
+
+build:
+  script: |
+    yum -y install epel-release
+    yum -y install golang
+    go env
+
+    curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
+    export NVM_DIR="$HOME/.nvm"
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+    nvm install --lts
+    nvm use --lts
+
+    apt-get update
+    apt-get -y install zip
+    mkdir -p /go/src/github.com/crankykernel
+    cp -a . /go/src/github.com/crankykernel/ctrader
+    cd /go/src/github.com/crankykernel/ctrader
+    go get -u github.com/golang/dep/cmd/dep
+    dep ensure -v
+    go build -v
+
+    make dist
+    cp dist/*.zip ${CI_PROJECT_DIR}
+
+  artifacts:
+    paths:
+      - "*.zip"
+
