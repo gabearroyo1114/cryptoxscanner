@@ -7,6 +7,8 @@ before_script:
   - curl -o /tmp/go.tar.gz -L https://dl.google.com/go/go1.10.2.linux-amd64.tar.gz
   - (cd /usr/local && tar xvf /tmp/go.tar.gz)
   - curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
+  - export NVM_DIR="$HOME/.nvm"
+  - . ${NVM_DIR}/nvm.sh
   - nvm install --lts
   - nvm use --lts
 
@@ -28,8 +30,8 @@ build:
     export PATH=$GOPATH/bin:$PATH
 
     # curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
-    export NVM_DIR="$HOME/.nvm"
-    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+    # export NVM_DIR="$HOME/.nvm"
+    # [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
     # nvm install --lts
     # nvm use --lts
 
