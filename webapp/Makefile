@@ -1,5 +1,5 @@
 all: update-version
-	ng build --prod --aot
+	./node_modules/.bin/ng build --prod --aot
 	cat ../VERSION.UI > dist/BUILD
 	cat ../VERSION.UI > dist/VERSION.UI
 
