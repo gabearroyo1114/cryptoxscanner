@@ -23,16 +23,19 @@ import (
 )
 
 type TickerMetrics struct {
+	// Common metrics.
 	PriceChangePercent  float64
 	VolumeChangePercent float64
 	High                float64
 	Low                 float64
 	Range               float64
 	RangePercent        float64
-	Vwap                float64
-	TotalVolume         float64
-	NetVolume           float64
-	BuyVolume           float64
+
+	// Require trades.
+	Vwap        float64
+	TotalVolume float64
+	NetVolume   float64
+	BuyVolume   float64
 }
 
 type TickerTracker struct {
@@ -44,8 +47,6 @@ type TickerTracker struct {
 
 	// Trades, in Binance format.
 	Trades []binance.AggTrade
-
-	LastTrade binance.AggTrade
 
 	HaveVwap        bool
 	HaveTotalVolume bool
@@ -68,20 +69,16 @@ func init() {
 }
 
 func NewTickerTracker(symbol string) *TickerTracker {
-	tracker := TickerTracker{}
-	tracker.Symbol = symbol
-
-	tracker.Metrics = make(map[int]*TickerMetrics)
-
-	for _, i := range Buckets {
-		tracker.Metrics[i] = &TickerMetrics{
-			PriceChangePercent:  0,
-			VolumeChangePercent: 0,
-		}
+	tracker := TickerTracker{
+		Symbol:  symbol,
+		Ticks:   []CommonTicker{},
+		Trades:  []binance.AggTrade{},
+		Metrics: make(map[int]*TickerMetrics),
 	}
 
-	tracker.Ticks = []CommonTicker{}
-	tracker.Trades = []binance.AggTrade{}
+	for _, i := range Buckets {
+		tracker.Metrics[i] = &TickerMetrics{}
+	}
 
 	return &tracker;
 }
@@ -94,8 +91,7 @@ func (t *TickerTracker) LastTick() *CommonTicker {
 }
 
 func (t *TickerTracker) Recalculate() {
-	ticker := t.LastTick()
-	//now := ticker.Timestamp
+	lastTick := t.LastTick()
 	now := time.Now()
 
 	nextBucket := 0
@@ -142,10 +138,11 @@ func (t *TickerTracker) Recalculate() {
 		metrics.RangePercent = Round3(metrics.Range / low * 100)
 	}
 
-	t.H24Metrics.High = ticker.High
-	t.H24Metrics.Low = ticker.Low
-	t.H24Metrics.Range = Round8(ticker.High - ticker.Low)
-	t.H24Metrics.RangePercent = Round3(t.H24Metrics.Range / ticker.Low * 100)
+	// Some 24 hour metrics.
+	t.H24Metrics.High = lastTick.High
+	t.H24Metrics.Low = lastTick.Low
+	t.H24Metrics.Range = Round8(lastTick.High - lastTick.Low)
+	t.H24Metrics.RangePercent = Round3(t.H24Metrics.Range / lastTick.Low * 100)
 
 	for i := 0; i < len(t.Ticks); i++ {
 		tick := t.Ticks[i]
@@ -164,11 +161,11 @@ func (t *TickerTracker) Recalculate() {
 		}
 
 		metrics := t.Metrics[bucket];
-		priceDiff := ticker.LastPrice - tick.LastPrice
+		priceDiff := lastTick.LastPrice - tick.LastPrice
 		priceDiffPct := Round3(priceDiff / tick.LastPrice * 100)
 		metrics.PriceChangePercent = priceDiffPct
 
-		volumeDiff := ticker.QuoteVolume - tick.QuoteVolume
+		volumeDiff := lastTick.QuoteVolume - tick.QuoteVolume
 		volumeDiffPct := Round3((volumeDiff / tick.QuoteVolume) * 100)
 		metrics.VolumeChangePercent = volumeDiffPct
 
@@ -186,93 +183,44 @@ func (t *TickerTracker) Recalculate() {
 		previousVolume = t.Metrics[Buckets[j]].VolumeChangePercent
 	}
 
-	// VWAP.
-	if len(t.Trades) > 0 {
-		t.HaveVwap = true
-		vwapPrice := float64(0)
-		vwapVolume := float64(0)
-
-		for i := len(t.Trades) - 1; i >= 0; i-- {
-			trade := t.Trades[i]
-			vwapVolume += trade.Quantity
-			vwapPrice += trade.Quantity * trade.Price
-			vwap := vwapPrice / vwapVolume
-
-			timeDiff := int(now.Sub(trade.Timestamp).Seconds())
-			bucket := ((timeDiff - 1) / 60) + 1
-
-			for _, i := range Buckets {
-				if bucket == i {
-					t.Metrics[i].Vwap = vwap
-				}
-			}
-		}
-	}
-
+	// Calculate values that depend on actual trades:
+	// - VWAP
+	// - Total volume
+	// - Net volume
 	if len(t.Trades) > 0 {
 		t.HaveNetVolume = true
 		t.HaveTotalVolume = true
-
+		t.HaveVwap = true;
+		vwapPrice := float64(0)
+		vwapVolume := float64(0)
 		buyVolume := float64(0)
 		sellVolume := float64(0)
+
 		for i := len(t.Trades) - 1; i >= 0; i-- {
 			trade := t.Trades[i]
+
 			age := now.Sub(trade.Timestamp)
+
 			if trade.IsBuy() {
 				buyVolume += trade.QuoteQuantity
 			} else {
 				sellVolume += trade.QuoteQuantity
 			}
+
+			vwapVolume += trade.Quantity
+			vwapPrice += trade.Quantity * trade.Price
+			vwap := vwapPrice / vwapVolume
+
 			totalVolume := buyVolume + sellVolume
 			netVolume := buyVolume - sellVolume
-			switch {
-			case age <= 1*60*time.Second:
-				bucket := 1
-				t.Metrics[bucket].NetVolume = netVolume
-				t.Metrics[bucket].TotalVolume = totalVolume
-				t.Metrics[bucket].BuyVolume = buyVolume
-				fallthrough
-			case age <= 2*60*time.Second:
-				bucket := 1
-				t.Metrics[bucket].NetVolume = netVolume
-				t.Metrics[bucket].TotalVolume = totalVolume
-				t.Metrics[bucket].BuyVolume = buyVolume
-				fallthrough
-			case age <= 3*60*time.Second:
-				bucket := 3
-				t.Metrics[bucket].NetVolume = netVolume
-				t.Metrics[bucket].TotalVolume = totalVolume
-				t.Metrics[bucket].BuyVolume = buyVolume
-				fallthrough
-			case age <= 4*60*time.Second:
-				bucket := 4
-				t.Metrics[bucket].NetVolume = netVolume
-				t.Metrics[bucket].TotalVolume = totalVolume
-				t.Metrics[bucket].BuyVolume = buyVolume
-				fallthrough
-			case age <= 5*60*time.Second:
-				bucket := 5
-				t.Metrics[bucket].NetVolume = netVolume
-				t.Metrics[bucket].TotalVolume = totalVolume
-				t.Metrics[bucket].BuyVolume = buyVolume
-				fallthrough
-			case age <= 10*60*time.Second:
-				bucket := 10
-				t.Metrics[bucket].NetVolume = netVolume
-				t.Metrics[bucket].TotalVolume = totalVolume
-				t.Metrics[bucket].BuyVolume = buyVolume
-				fallthrough
-			case age <= 15*60*time.Second:
-				bucket := 15
-				t.Metrics[bucket].NetVolume = netVolume
-				t.Metrics[bucket].TotalVolume = totalVolume
-				t.Metrics[bucket].BuyVolume = buyVolume
-				fallthrough
-			case age <= 60*60*time.Second:
-				bucket := 60
-				t.Metrics[bucket].NetVolume = netVolume
-				t.Metrics[bucket].TotalVolume = totalVolume
-				t.Metrics[bucket].BuyVolume = buyVolume
+
+			for _, i := range Buckets {
+				if age <= time.Duration(i)*60*time.Second {
+					t.Metrics[i].NetVolume = netVolume
+					t.Metrics[i].TotalVolume = totalVolume
+					t.Metrics[i].BuyVolume = buyVolume
+					t.Metrics[i].Vwap = vwap
+				}
 			}
 		}
 	}
@@ -300,12 +248,14 @@ func (t *TickerTracker) AddTrade(trade binance.AggTrade) {
 		return
 	}
 
-	if trade.Timestamp.Before(t.LastTrade.Timestamp) {
-		log.Printf("error: received trade old than previous trade\n")
+	if len(t.Trades) > 0 {
+		lastTrade := t.Trades[len(t.Trades)-1]
+		if trade.Timestamp.Before(lastTrade.Timestamp) {
+			log.Printf("error: received trade old than previous trade\n")
+		}
 	}
 
 	t.Trades = append(t.Trades, trade)
-	t.LastTrade = trade
 }
 
 func (t *TickerTracker) PruneTrades(now time.Time) {
