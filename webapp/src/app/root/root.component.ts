@@ -13,8 +13,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import {AfterViewInit, Component, OnInit} from '@angular/core';
-import * as ClipboardJS from "clipboard";
+import {Component, OnInit} from '@angular/core';
 import * as toastr from "toastr";
 import {ScannerApiService} from '../scanner-api.service';
 import {HttpClient} from '@angular/common/http';
@@ -24,7 +23,7 @@ import {environment} from '../../environments/environment';
     selector: 'app-root',
     templateUrl: './root.component.html',
 })
-export class RootComponent implements OnInit, AfterViewInit {
+export class RootComponent implements OnInit {
 
     private uiVersionInterval: any;
 
@@ -94,14 +93,5 @@ export class RootComponent implements OnInit, AfterViewInit {
         this.uiVersionInterval = setInterval(() => {
             this.checkUiVersion();
         }, 60000);
-    }
-
-    ngAfterViewInit(): void {
-        new ClipboardJS(".clipper")
-                .on('success', (e) => {
-                    toastr.success(e.trigger.dataset.notification, '', {
-                        closeButton: true,
-                    });
-                });
     }
 }

@@ -10,7 +10,6 @@
     "lint": "ng lint",
     "update-build": "node ./replace.build.js"
   },
-  "private": true,
   "dependencies": {
     "@angular/animations": "^5.2.0",
     "@angular/common": "^5.2.9",
@@ -22,7 +21,6 @@
     "@angular/platform-browser-dynamic": "^5.2.9",
     "@angular/router": "^5.2.9",
     "bootstrap": "^4.0.0",
-    "clipboard": "^2.0.0",
     "core-js": "^2.4.1",
     "jquery": "^3.3.1",
     "lodash": "^4.17.10",
@@ -30,7 +28,6 @@
     "moment": "^2.21.0",
     "mousetrap": "^1.6.1",
     "popper.js": "^1.14.1",
-    "primeng": "^5.2.3",
     "rxjs": "^5.5.7",
     "toastr": "^2.1.4",
     "zone.js": "^0.8.19"
