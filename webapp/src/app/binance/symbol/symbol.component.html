@@ -152,7 +152,7 @@
           </tr>
           </thead>
           <tr>
-            <td>{{lastUpdate.close}}</td>
+            <td>{{lastUpdate.close | number:".8-8"}}</td>
             <td>{{(lastUpdate.ask - lastUpdate.bid) / lastUpdate.bid |
               percent:".3"}}
             </td>
@@ -230,7 +230,7 @@
         </table>
       </div>
       <div class="table-responsive">
-        <table class="table table-sm table-bordered">
+        <table [hidden]="!lastUpdate" class="table table-sm table-bordered">
           <thead>
           <tr>
             <th title="Price range in past minute">1mR</th>
