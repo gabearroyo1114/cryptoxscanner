@@ -1,5 +1,5 @@
 export const environment = {
     production: false,
-    uiVersion: 15,
+    uiVersion: 16,
     protoVersion: 3,
 };
