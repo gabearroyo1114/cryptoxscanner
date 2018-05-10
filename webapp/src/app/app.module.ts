@@ -37,6 +37,8 @@ import {BinanceSymbolComponent} from './binance/symbol/symbol.component';
 import {SymbolFilterPipe} from './symbol-filter.pipe';
 import {BinanceApiService} from './binance-api.service';
 import {DoubleScrollModule} from 'mindgaze-doublescroll/dist';
+import { BaseassetPipe } from './baseasset.pipe';
+import { ExchangesymbolPipe } from './exchangesymbol.pipe';
 
 const appRoutes: Routes = [
     {
@@ -97,6 +99,8 @@ const appRoutes: Routes = [
         BinanceSymbolComponent,
         OrderbookComponent,
         SymbolFilterPipe,
+        BaseassetPipe,
+        ExchangesymbolPipe,
     ],
     imports: [
         BrowserModule,

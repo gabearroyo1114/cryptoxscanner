@@ -749,22 +749,32 @@ export class BinanceSymbolComponent implements OnInit, OnDestroy, AfterViewInit 
 
         console.log("chart: connecting to binance stream.");
 
+        const symbolLower = this.symbol.toLowerCase();
+        const streams = [
+            `${symbolLower}@aggTrade`,
+            `${symbolLower}@ticker`,
+        ];
+
+        if (this.useHighStocksCandleChart) {
+            const klineStreams = [
+                `${symbolLower}@kline_1m/`,
+                `${symbolLower}@kline_3m/`,
+                `${symbolLower}@kline_5m/`,
+                `${symbolLower}@kline_15m/`,
+                `${symbolLower}@kline_30m/`,
+                `${symbolLower}@kline_1h/`,
+                `${symbolLower}@kline_2h/`,
+                `${symbolLower}@kline_4h/`,
+                `${symbolLower}@kline_6h/`,
+                `${symbolLower}@kline_8h/`,
+                `${symbolLower}@kline_12h/`,
+                `${symbolLower}@kline_1d/`,
+            ];
+            streams.push(...klineStreams);
+        }
+
         const url = `wss://stream.binance.com:9443/stream?streams=` +
-                `${this.symbol.toLowerCase()}@kline_1m/` +
-                `${this.symbol.toLowerCase()}@kline_3m/` +
-                `${this.symbol.toLowerCase()}@kline_5m/` +
-                `${this.symbol.toLowerCase()}@kline_15m/` +
-                `${this.symbol.toLowerCase()}@kline_30m/` +
-                `${this.symbol.toLowerCase()}@kline_1h/` +
-                `${this.symbol.toLowerCase()}@kline_2h/` +
-                `${this.symbol.toLowerCase()}@kline_4h/` +
-                `${this.symbol.toLowerCase()}@kline_6h/` +
-                `${this.symbol.toLowerCase()}@kline_8h/` +
-                `${this.symbol.toLowerCase()}@kline_12h/` +
-                `${this.symbol.toLowerCase()}@kline_1d/` +
-                `${this.symbol.toLowerCase()}@aggTrade/` +
-                `${this.symbol.toLowerCase()}@ticker`
-        ;
+                streams.join("/");
 
         const ws = new WebSocket(url);
 

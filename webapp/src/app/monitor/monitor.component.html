@@ -217,10 +217,12 @@
                 </button>
               </div>
               <div class="form-group row">
-                <label class="col-sm-3 col-form-label col-form-label-sm">Window</label>
+                <label
+                    class="col-sm-3 col-form-label col-form-label-sm">Window</label>
                 <div class="col-sm-9">
                   <div class="input-group input-group-sm">
-                    <select class="form-control form-control-sm" name="dropAlertsWindow"
+                    <select class="form-control form-control-sm"
+                            name="dropAlertsWindow"
                             [(ngModel)]="config.alerts.gain.window"
                             (change)="saveConfig();">
                       <option>1m</option>
@@ -236,7 +238,8 @@
                 </div>
               </div>
               <div class="form-group row">
-                <label class="col-sm-3 col-form-label col-form-label-sm">Gain %</label>
+                <label class="col-sm-3 col-form-label col-form-label-sm">Gain
+                  %</label>
                 <div class="col-sm-9">
                   <div class="input-group input-group-sm">
                     <input type="number" class="form-control"
@@ -261,7 +264,8 @@
                 </div>
               </div>
               <div class="form-group row">
-                <label class="col-sm-3 col-form-label col-form-label-sm">Volume</label>
+                <label
+                    class="col-sm-3 col-form-label col-form-label-sm">Volume</label>
                 <div class="col-sm-5">
                   <div class="input-group input-group-sm">
                     <input type="number" class="form-control"
@@ -275,7 +279,8 @@
                   </div>
                 </div>
                 <div class="col-sm-4">
-                  <select class="form-control form-control-sm" name="dropAlertsVolumeWindow"
+                  <select class="form-control form-control-sm"
+                          name="dropAlertsVolumeWindow"
                           [(ngModel)]="config.alerts.gain.volumeRange"
                           (change)="saveConfig();">
                     <option>24h</option>
@@ -306,7 +311,8 @@
                 </button>
               </div>
               <div class="form-group row">
-                <label class="col-sm-3 col-form-label col-form-label-sm">Window</label>
+                <label
+                    class="col-sm-3 col-form-label col-form-label-sm">Window</label>
                 <div class="col-sm-9">
                   <div class="input-group input-group-sm">
                     <select class="custom-select" name="dropAlertsWindow"
@@ -325,7 +331,8 @@
                 </div>
               </div>
               <div class="form-group row">
-                <label class="col-sm-3 col-form-label col-form-label-sm">Gain %</label>
+                <label class="col-sm-3 col-form-label col-form-label-sm">Gain
+                  %</label>
                 <div class="col-sm-9">
                   <div class="input-group input-group-sm">
                     <input type="number" class="form-control"
@@ -417,6 +424,25 @@
               <td>{{alert.ticker.volume | number:".2-2"}}</td>
               <td>
                 <span class="float-right">
+                  <a *ngIf="exchange == 'binance'"
+                     class="btn btn-outline-secondary btn-sm"
+                     href="https://www.binance.com/tradeDetail.html?symbol={{alert.ticker.symbol | exchangesymbol:'binance'}}"
+                     target="_blank" alt="Binance" title="Binance">B</a>
+
+                  <a *ngIf="exchange == 'kucoin'"
+                     href="https://www.kucoin.com/#/trade.pro/{{alert.ticker.symbol}}"
+                     class="btn btn-outline-secondary btn-sm" target="_blank"
+                     alert="KuCoin" title="KuCoin">K</a>
+
+                  <a *ngIf="exchange == 'binance'"
+                     href="https://www.tradingview.com/chart?symbol=BINANCE:{{alert.ticker.symbol}}"
+                     class="btn btn-outline-secondary btn-sm" target="_blank"
+                     alert="Trading View" title="Trading View">TV</a>
+
+                  <a href="https://cryptopanic.com/news/{{alert.ticker.symbol | baseasset}}/"
+                     class="btn btn-outline-secondary btn-sm"
+                     target="_blank" alt="Crypto Panic"
+                     title="Crypto Panic">CP</a>
                   <button (click)="removeAlert(i);"
                           style="background: transparent; border: 0px; padding: 0px; margin: 0px;"
                           type="button"><i class="fas fa-trash"></i>
