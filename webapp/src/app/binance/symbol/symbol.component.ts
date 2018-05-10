@@ -388,7 +388,11 @@ class DepthChart {
 })
 export class BinanceSymbolComponent implements OnInit, OnDestroy, AfterViewInit {
 
+    /** The symbol with quote asset. */
     symbol: string = "BNBBTC";
+
+    /** The base asset. */
+    baseAsset: string = null;
 
     exchangeSymbol: string = "";
 
@@ -534,7 +538,9 @@ export class BinanceSymbolComponent implements OnInit, OnDestroy, AfterViewInit 
         switch (event.type) {
             case "visibilitychange":
                 this.priceChart.redraw();
-                this.candleStickChart.redraw();
+                if (this.useHighStocksCandleChart) {
+                    this.candleStickChart.redraw();
+                }
                 this.depthChart.redraw();
                 break;
             default:
@@ -547,6 +553,11 @@ export class BinanceSymbolComponent implements OnInit, OnDestroy, AfterViewInit 
     }
 
     init() {
+        this.baseAsset = this.symbol
+                .replace(/BTC$/, "")
+                .replace(/USDT$/, "")
+                .replace(/BNB$/, "")
+                .replace(/ETH$/, "");
         this.trades = [];
 
         this.priceChart = new PriceChart("priceChart");

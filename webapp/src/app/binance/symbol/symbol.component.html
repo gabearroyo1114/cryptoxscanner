@@ -24,6 +24,11 @@
         </li>
 
         <li class="nav-item mr-2">
+          <a href="https://cryptopanic.com/news/{{baseAsset}}/"
+             class="nav-link btn btn-outline-secondary btn-sm" target="_blank">CryptoPanic</a>
+        </li>
+
+        <li class="nav-item mr-2">
           <span *ngIf="lastPrice" class="navbar-text">Last: {{lastPrice |
             number:".8"}}</span>
         </li>
@@ -53,7 +58,7 @@
           </span>
         </li>
         <li class="nav-item navbar-text mr-2">
-          TokenFX Socket:
+          CryptoXScanner Socket:
           <span [ngSwitch]="tokenFxState">
             <span *ngSwitchCase="'connected'">
               <span class="badge badge-success">{{tokenFxState}}</span>
