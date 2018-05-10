@@ -449,8 +449,8 @@ export class BinanceSymbolComponent implements OnInit, OnDestroy, AfterViewInit 
     }
 
     ngAfterViewInit() {
-        $("[data-toggle='tooltip']").tooltip();
-        $("th").tooltip();
+        (<any>$("[data-toggle='tooltip']")).tooltip();
+        (<any>$("th")).tooltip();
     }
 
     private reset() {

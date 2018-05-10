@@ -326,13 +326,13 @@ export class BinanceMonitorComponent implements OnInit, OnDestroy, AfterViewInit
 
     ngAfterViewInit() {
         $(function () {
-            $('[data-toggle="popover"]').popover();
+            (<any>$('[data-toggle="popover"]')).popover();
         });
         $(function () {
-            $('[data-toggle="tooltip"]').tooltip();
+            (<any>$('[data-toggle="tooltip"]')).tooltip();
         });
 
-        $('#losersTablePopover').popover({
+        (<any>$('#losersTablePopover')).popover({
             html: true,
             title: "Top Losers",
             content: `
@@ -351,7 +351,7 @@ export class BinanceMonitorComponent implements OnInit, OnDestroy, AfterViewInit
             `,
         });
 
-        $('#gainersTablePopover').popover({
+        (<any>$('#gainersTablePopover')).popover({
             html: true,
             title: "Top Gainers",
             content: `
