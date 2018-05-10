@@ -16,7 +16,7 @@
 import {AfterViewInit, Component, OnDestroy, OnInit} from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {ActivatedRoute, Router} from '@angular/router';
-import {SymbolUpdate, ScannerApiService} from '../../scanner-api.service';
+import {ScannerApiService, SymbolUpdate} from '../../scanner-api.service';
 import {Subscription} from 'rxjs/Subscription';
 
 import {
@@ -29,6 +29,7 @@ import {
 import * as Mousetrap from "mousetrap";
 import * as $ from "jquery";
 
+declare var TradingView: any;
 declare var Highcharts: any;
 
 interface Trade {
@@ -432,6 +433,10 @@ export class BinanceSymbolComponent implements OnInit, OnDestroy, AfterViewInit 
 
     ATR: any = {};
 
+    showTradingViewCharts: boolean = true;
+
+    useHighStocksCandleChart: boolean = false;
+
     constructor(private http: HttpClient,
                 private route: ActivatedRoute,
                 private router: Router,
@@ -548,7 +553,9 @@ export class BinanceSymbolComponent implements OnInit, OnDestroy, AfterViewInit 
 
         this.depthChart = new DepthChart("depthChart");
 
-        this.candleStickChart = new CandleStickChart("candleStickChart");
+        if (this.useHighStocksCandleChart) {
+            this.candleStickChart = new CandleStickChart("candleStickChart");
+        }
 
         setInterval(() => {
             const depthUrl = "/api/1/binance/proxy/api/v1/depth";
@@ -577,6 +584,50 @@ export class BinanceSymbolComponent implements OnInit, OnDestroy, AfterViewInit 
                 this.ATR[interval] = atr[0];
             });
         }
+
+        this.showTradingViewCharts = false;
+        setTimeout(() => {
+            this.showTradingViewCharts = true;
+            setTimeout(() => {
+                const tv_1m = new TradingView.widget(
+                        {
+                            "autosize": true,
+                            "symbol": "BINANCE:" + this.symbol,
+                            "interval": "1",
+                            "timezone": "Etc/UTC",
+                            "theme": "Dark",
+                            "style": "1",
+                            "locale": "en",
+                            "toolbar_bg": "#f1f3f6",
+                            "enable_publishing": false,
+                            "withdateranges": true,
+                            "show_popup_button": true,
+                            "popup_width": "1000",
+                            "popup_height": "650",
+                            "container_id": "tradingview-1m",
+                        }
+                );
+                const tv_5m = new TradingView.widget(
+                        {
+                            "autosize": true,
+                            "symbol": "BINANCE:" + this.symbol,
+                            "interval": "5",
+                            "timezone": "Etc/UTC",
+                            "theme": "Dark",
+                            "style": "1",
+                            "locale": "en",
+                            "toolbar_bg": "#f1f3f6",
+                            "enable_publishing": false,
+                            "withdateranges": true,
+                            "show_popup_button": true,
+                            "popup_width": "1000",
+                            "popup_height": "650",
+                            "container_id": "tradingview-5m",
+                        }
+                );
+            }, 0);
+        }, 0);
+
     }
 
     // Calculate the ATR (Average True Range). A list of ATRs is returned,
@@ -600,6 +651,9 @@ export class BinanceSymbolComponent implements OnInit, OnDestroy, AfterViewInit 
     }
 
     private initKlines() {
+        if (!this.useHighStocksCandleChart) {
+            return;
+        }
         this.binanceApi.getKlines({
             symbol: this.symbol.toUpperCase(),
             interval: this.klineInterval,
@@ -734,7 +788,9 @@ export class BinanceSymbolComponent implements OnInit, OnDestroy, AfterViewInit 
             if (data.stream.indexOf(`@kline_${this.klineInterval}`) > -1) {
                 if (this.klinesReady) {
                     const kline = new StreamKline(data.data.k);
-                    this.candleStickChart.update(kline);
+                    if (this.useHighStocksCandleChart) {
+                        this.candleStickChart.update(kline);
+                    }
                     this.lastKline = kline;
                 }
             } else if (data.stream.indexOf("@trade") > -1) {

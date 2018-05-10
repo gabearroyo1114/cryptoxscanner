@@ -334,30 +334,35 @@
     </div>
   </div>
 
-  <div class="row">
+  <!-- Wrapped in an if so it can be set to false to remove the DOM elements
+       and hopefully free the memory. -->
+  <div class="row" *ngIf="showTradingViewCharts">
+    <div class="col">
+      <div id="tradingview-1m" style="height: 441px;"></div>
+    </div>
+    <div class="col">
+      <div id="tradingview-5m" style="height: 441px;"></div>
+    </div>
+  </div>
 
+  <div class="row" *ngIf="useHighStocksCandleChart">
     <div class="col">
       <div class="card">
         <div class="card-header">
           <ul class="nav nav-pills">
-
             <li class="nav-item mr-2">
               <b>Candlesticks</b>
             </li>
-
             <li class="nav-item" *ngFor="let val of availableKlineIntervals">
               <a class="nav-link" [ngClass]="{'active': val == klineInterval}"
                  href="javascript:void(0);"
                  (click)="changeInterval(val)">{{val}}</a>
             </li>
-
           </ul>
-
         </div>
         <div id="candleStickChart" style="height: 400px; width: 98%;"></div>
       </div>
     </div>
-
   </div>
 
   <div class="row mt-2">
